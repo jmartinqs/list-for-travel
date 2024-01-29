@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // const initialItems = [
 //   { id: 1, description: "Passports", quantity: 2, packed: false },
@@ -9,8 +9,8 @@ import { useState } from "react";
 export default function App() {
   const [items, setItems] = useState([]);
 
-  function handleAddItems(item) {
-    setItems((items) => [...items, item]);
+  function handleAddItems(newItem) {
+    setItems((prevItems) => [...prevItems, newItem]);
   }
 
   function handleDeleteItem(id) {
@@ -30,11 +30,11 @@ export default function App() {
       <Logo />
       <Form onAddItems={handleAddItems} />
       <PackingList
-        Items={items}
+        items={items}
         onDeleteItem={handleDeleteItem}
         onToggleItems={handleToggleItem}
       />
-      <Stats />
+      <Stats items={items} />
     </div>
   );
 }
@@ -53,7 +53,6 @@ function Form({ onAddItems }) {
     if (!description) return;
 
     const newItem = { description, quantity, packed: false, id: Date.now() };
-    console.log(newItem);
 
     onAddItems(newItem);
 
@@ -85,7 +84,11 @@ function Form({ onAddItems }) {
   );
 }
 
-function PackingList({ items, onDeleteItem, onToggleItems }) {
+function PackingList({ items = [], onDeleteItem, onToggleItems }) {
+  useEffect(() => {
+    console.log("PackingList has been re-rendered with updated items:", items);
+  }, [items]);
+
   return (
     <>
       <div className="list">
@@ -120,10 +123,25 @@ function Item({ item, onDeleteItem, onToggleItems }) {
   );
 }
 
-function Stats() {
+function Stats({ items }) {
+  if (!items.length)
+    return (
+      <p className="stats">
+        <em>Start adding some items to your packing list</em>
+      </p>
+    );
+
+  const numItems = items.length;
+  const numPacked = items.filter((item) => item.packed).length;
+  const percetage = Math.round((numPacked / numItems) * 100);
+
   return (
     <footer className="stats">
-      <em>You have x items on your list, and you already packed x (x%)</em>
+      <em>
+        {percetage === 100
+          ? " You got everything! You are ready to go!"
+          : `You have ${numItems} items on your list, and you already packed ${numPacked} (${percetage}%)`}
+      </em>
     </footer>
   );
 }
