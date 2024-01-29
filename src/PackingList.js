@@ -23,9 +23,6 @@ export default function PackingList({
       .slice()
       .sort((a, b) => Number(a.packed) - Number(b.packed));
 
-  // useEffect(() => {
-  //   console.log("PackingList has been re-rendered with updated items:", items);
-  // }, [items]);
   return (
     <div className="list">
       <ul>
